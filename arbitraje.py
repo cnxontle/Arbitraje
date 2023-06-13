@@ -59,11 +59,12 @@ for moneda in monedas:
         for moneda2 in monedas:
             if moneda2 != moneda:
                 #buscar coincidencias
-                existe_exchange1_par1 = data[moneda2].loc[(data[moneda2]["Exchange_Par"] == exchange_par1)].shape[0] > 0
-                if existe_exchange1_par1:
-                    existe_exchange2_par2 = data[moneda2].loc[(data[moneda2]["Exchange_Par"] == exchange_par2)].shape[0] > 0
+                existe_exchange1_par1 = data[moneda2].loc[data[moneda2]["Exchange_Par"] == exchange_par1].index
+                if not existe_exchange1_par1.empty:
+                    print("si existe")
+                    existe_exchange2_par2 = data[moneda2].loc[(data[moneda2]["Exchange_Par"] == exchange_par2)].index[0]
 
-                    if existe_exchange2_par2:
+                    if not existe_exchange2_par2.empty:
                         
                         print(x)
                         x+=1
