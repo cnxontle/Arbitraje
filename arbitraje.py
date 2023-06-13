@@ -19,14 +19,15 @@ for moneda in monedas:
     for exchange in exchanges:
         exchange_name = exchange['market']['name']
         pair = exchange['target']
+        exchange_pair = exchange_name + pair
         price = exchange['converted_last']['usd']
         bid_ask_spread = exchange['bid_ask_spread_percentage']
         trust_score = exchange['trust_score']
         if trust_score == "green":
-            exchange_data.append([exchange_name, pair, price, bid_ask_spread])
+            exchange_data.append([exchange_pair, price, bid_ask_spread])
 
     # Crear un DataFrame de Pandas con los datos
-    df = pd.DataFrame(exchange_data, columns=['Exchange', 'Par', 'Precio (USD)', 'Margen'])
+    df = pd.DataFrame(exchange_data, columns=['Exchange_Par', 'Precio (USD)', 'Margen'])
     data[moneda] = df
     
     
@@ -35,34 +36,37 @@ for moneda in monedas:
     #Buscar el GAP local
     for index, row in data[moneda].iterrows():
         precio1 =  row["Precio (USD)"]
-        exchange1 = row["Exchange"]
-        par1 = row["Par"]
+        exchange_par1 = row["Exchange_Par"]
+        
         for index2, row in data[moneda].iterrows():
             precio2 = row["Precio (USD)"]
-            exchange2 = row["Exchange"]
-            par2 = row["Par"]
+            exchange_par2 = row["Exchange_Par"]
+            
             gap = ((float(precio1)-float(precio2))/float(precio1))*100
-            gap_local.append([moneda, exchange1, exchange2, par1, par2, gap])
-    df = pd.DataFrame(gap_local, columns=['Moneda','Exchange1','Exchange2','Par1','Par2','Gap'])
+            if gap > 0:
+                gap_local.append([moneda, exchange_par1, exchange_par2, gap])
+    df = pd.DataFrame(gap_local, columns=['Moneda','Exchange_Par1','Exchange_Par2','Gap'])
     gaps[moneda]= df
     
-
+x=0
 for moneda in monedas:
     for gap, row in gaps[moneda].iterrows():
         gap = row["Gap"]
-        exchange1 = row["Exchange1"]
-        exchange2 = row["Exchange2"]
-        par1 = row["Par1"]
-        par2 = row["Par2"]
+        exchange_par1 = row["Exchange_Par1"]
+        exchange_par2 = row["Exchange_Par2"]
+        
 
         for moneda2 in monedas:
             if moneda2 != moneda:
                 #buscar coincidencias
-                existe_exchange1_par1 = data[moneda2].loc[(data[moneda2]["Exchange"] == exchange1) & (data[moneda2]["Par"] == par1)].shape[0] > 0
-                existe_exchange2_par2 = data[moneda2].loc[(data[moneda2]["Exchange"] == exchange2) & (data[moneda2]["Par"] == par2)].shape[0] > 0
+                existe_exchange1_par1 = data[moneda2].loc[(data[moneda2]["Exchange_Par"] == exchange_par1)].shape[0] > 0
+                if existe_exchange1_par1:
+                    existe_exchange2_par2 = data[moneda2].loc[(data[moneda2]["Exchange_Par"] == exchange_par2)].shape[0] > 0
 
-                if (existe_exchange1_par1 and existe_exchange2_par2):
-                    print("e")
+                    if existe_exchange2_par2:
+                        
+                        print(x)
+                        x+=1
 
         #consolidar tablas y buscar gap inverso
         #existe_exchange1_par1 = df_ripple.loc[(df_ripple["Exchange"] == "binance") & (df_ripple["Par"] == "USD")].shape[0] > 0
