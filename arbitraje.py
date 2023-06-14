@@ -41,17 +41,15 @@ for moneda in monedas:
         precio1 =  row["Precio (USD)"]
         exchange_par1 = row["Exchange_Par"]
         margen1 = row["Margen"]
-        
         for index2, row in data[moneda].iterrows():
             precio2 = row["Precio (USD)"]
             exchange_par2 = row["Exchange_Par"]
             margen2 = row["Margen"]
-            
             gap = (((float(precio1)-float(precio2))/float(precio1))*100)-(margen1+margen2)
             if gap > 0:
-                gap_local.append([moneda, exchange_par1, exchange_par2, gap])
+                gap_local.append([moneda, exchange_par1, exchange_par2, precio1, precio2, gap])
     #crear un segundo data frame de aproximadamente (n x n / 2) elementos
-    df = pd.DataFrame(gap_local, columns=['Moneda','Exchange_Par1','Exchange_Par2','Gap'])
+    df = pd.DataFrame(gap_local, columns=['Moneda','Exchange_Par1','Exchange_Par2', 'Precio1', 'Precio2', 'Gap'])
     gaps[moneda]= df
     
 #Iterar el segundo dataframe de cada moneda, para buscar un Gap cruzado vs otras monedas
@@ -60,6 +58,9 @@ for moneda in monedas:
         gap = row["Gap"]
         exchange_par1 = row["Exchange_Par1"]
         exchange_par2 = row["Exchange_Par2"]
+        precio1 = row["Precio1"]
+        precio2 = row["Precio2"]
+
         for moneda2 in monedas:
             if moneda2 != moneda:
                 #buscar coincidencias
@@ -74,12 +75,13 @@ for moneda in monedas:
                         margen4 = data[moneda2].at[indice_exchange2_par2[0], 'Margen']
                         gap2 = -((valor_precio1 - valor_precio2)/valor_precio1)*100
                         gap_cruzado = (gap + gap2)-(margen3 + margen4)
-
+                        precioMoneda1 = str(precio1)+"/"+str(precio2)
+                        precioMoneda2 = str(valor_precio1)+"/"+str(valor_precio2)
                         if gap_cruzado > 1:
-                            mined.append([intercambio, exchange_par1, exchange_par2, gap_cruzado])
+                            mined.append([intercambio, exchange_par1, exchange_par2, precioMoneda1, precioMoneda2, gap_cruzado])
                             
-
-encabezados = ["Intercambio", "Exchange Par 1", "Exchange Par 2", "Gap Cruzado"]                          
+#Guardar los datos en un CSV
+encabezados = ["Intercambio", "Exchange Par 1", "Exchange Par 2", "Moneda1", "Moneda2", "Gap"]                          
 csv_file = 'mined_data.csv'
 with open(csv_file, mode='w', newline='') as file:
     writer = csv.writer(file)
