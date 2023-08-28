@@ -77,7 +77,7 @@ for moneda in monedas:
                         gap_cruzado = (gap + gap2)-(margen3 + margen4)
                         precioMoneda1 = str(precio1)+"/"+str(precio2)
                         precioMoneda2 = str(valor_precio1)+"/"+str(valor_precio2)
-                        if gap_cruzado > 1:
+                        if gap_cruzado > 0.1:
                             mined.append([intercambio, exchange_par1, exchange_par2, precioMoneda1, precioMoneda2, gap_cruzado])
                             
 #Guardar los datos en un CSV
@@ -89,3 +89,4 @@ with open(csv_file, mode='w', newline='') as file:
     writer.writerows(mined)
 
 print("Archivo CSV guardado con éxito: mined_data.csv")
+print("login")
