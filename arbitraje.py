@@ -89,4 +89,4 @@ with open(csv_file, mode='w', newline='') as file:
     writer.writerows(mined)
 
 print("Archivo CSV guardado con éxito: mined_data.csv")
-print("login")
+print("cscscsc")
